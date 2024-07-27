@@ -1,0 +1,12 @@
+---
+applications:
+  - name: report-backend
+    memory: 1024M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    env:
+      NODE_ENV: production
+    disk_quota: 1G
+    path: .
+    command: npm start

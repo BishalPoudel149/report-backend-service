@@ -1,35 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { ProductService } from './services/product.service';
-import { googleTrendService } from './services/googletrend.service';
 import { DatabaseService } from './services/database.service';
+import { GoogleTrendsService } from './services/googledirect.service';
 
 @Injectable()
 export class AppService {
 
   constructor(private readonly productService: ProductService,
-     private readonly googleTrendService :googleTrendService,
      private readonly databaseService: DatabaseService,
+     private readonly googleTrendsService:GoogleTrendsService
     
     ) {}
 
 
   locations:any;
-  category:string;
 
 
   getHello(): string {
     return 'Hello World!';
   }
 
-  // call the google trend api to fetch the data
-  //Fetching data for single location or multiple location ? 
-  getTrend(productCategory:string,days:number){
-       //Now on call the Service which will internally call the google trend api
-       this.locations= this.databaseService.getLocation(productCategory);
-       
-       return this.locations;
 
-       //return this.googleTrendService.getTrends(productCategory,this.locations,days);
+  async getTrend(category:string){       
+  this.locations= await this.databaseService.getLocation(category);
+  console.log(this.locations);
+
+await this.getTrendsForLocations(category, this.locations);
+
+const currentDate = '2023-11-15';
+const previousDate = '2023-11-13';
+
+// Optional: Ensure dates are in 'YYYY-MM-DD' format
+const formattedCurrentDate = new Date(currentDate).toISOString().split('T')[0];
+const formattedPreviousDate = new Date(previousDate).toISOString().split('T')[0];
+
+   const mappedData = await this.databaseService.callReportProcedure(category,currentDate,previousDate);
+   // flush the trend data
+
+   this.databaseService.flushTrendData();
+
+   return mappedData;
+  }
+
+  async getTrendsForLocations(category: string, locations: string[]): Promise<any> {
+    try {
+      const data = await this.googleTrendsService.fetchAndCalculateForLocations(category, locations).toPromise();
+      //insert trend for location
+
+      await this.databaseService.insertTrendData(data);
+
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch trends for locations', error);
+      throw error;
+    }
   }
 
 }

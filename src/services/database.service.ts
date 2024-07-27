@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { GoogleTrendDto } from "src/dto/googletrend.dto";
 import { TestDto } from "src/dto/test.dto";
 const hana = require('@sap/hana-client');
 
@@ -29,57 +30,106 @@ export class DatabaseService {
 
 async getLocation(category: string): Promise<string[]> {
   try {
-    console.log(category);
-    // Step 1: Fetch product IDs based on the category from Productmasterdata
-    const productIdsQuery = `
-      SELECT productId FROM PRODUCTMASTERDATA WHERE category = ?`;
-    const productIds = await this.executeQuery(productIdsQuery, [category]);
-
-    if (productIds.length === 0) {
-      this.logger.warn(`No products found for category: ${category}`);
-      return [];
-    }
-    const productIdList = productIds.map((row: any) => row.PRODUCTID).join("','");
-    console.log(`productIdList:${productIdList}`);
-
-    // Step 2: Fetch locations from Sales table based on the product IDs
+    // Step 1: Fetch locations from the view based on the category
     const locationsQuery = `
-      SELECT DISTINCT Location FROM SALES WHERE productId IN ('${productIdList}')`;
-    const locations = await this.executeQuery(locationsQuery);
+      SELECT LOCATIONCODE FROM ProductLocationView WHERE CATEGORY = ?
+    `;
+    
+    console.log(`Executing query: ${locationsQuery}`);
+    const locations = await this.executeQuery(locationsQuery, [category]);
 
-    console.log(locations);
-
-    return locations;
-    //return locations.map((row: any) => row.Location);
+    // Extracting the location names from the result set
+    return locations.map((row: any) => row.LOCATIONCODE);
   } catch (error) {
     this.logger.error('Failed to fetch locations', error);
     throw new Error('Failed to fetch locations');
   }
 }
 
+
 private async executeQuery(query: string, params: any[] = []): Promise<any[]> {
-  console.log(`query:${query}`);
+  console.log(`query: ${query}`);
+  console.log(`params: ${params}`);
   return new Promise((resolve, reject) => {
-    this.client.prepare(query, (err: any, statement: any) => {
+    this.client.exec(query, params, (err: any, rows: any[]) => {
       if (err) {
-        this.logger.error('Failed to prepare statement', err);
+        this.logger.error('Failed to execute query', err);
         return reject(err);
       }
-
-      statement.exec(params, (err: any, rows: any[]) => {
-        if (err) {
-          this.logger.error('Failed to execute query', err);
-          return reject(err);
-        }
-
-        resolve(rows);
-      });
+      resolve(rows);
     });
-
   });
 }
 
 
+ // Method to insert trend data
+ async insertTrendData(trends: GoogleTrendDto[]): Promise<void> {
+  const insertSQL = `
+    INSERT INTO TrendData (location, current, previous, change, category)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  try {
+    const insertPromises = trends.map(trend => {
+      return new Promise<void>((resolve, reject) => {
+        this.client.prepare(insertSQL, (err: any, statement: any) => {
+          if (err) {
+            this.logger.error('Failed to prepare insert statement', err);
+            return reject(err);
+          }
+
+          statement.exec([trend.location, trend.current, trend.previous, trend.change, trend.category], (err: any) => {
+            if (err) {
+              this.logger.error('Failed to insert data', err);
+              return reject(err);
+            }
+            resolve();
+          });
+        });
+      });
+    });
+
+    await Promise.all(insertPromises);
+    this.logger.log('Trend data inserted successfully');
+  } catch (err) {
+    this.logger.error('Failed to insert some trend data', err);
+  }
+}
+
+
+async callReportProcedure(
+  category: string,
+  currentDate,
+  previousDate
+  // currentDate: string = new Date().toISOString().split('T')[0], // Default to today
+  // previousDate: string = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0] // Default to one day before today
+  
+): Promise<any> {
+  try {
+    const procedureCall = `CALL REPORT_PROCEDURE(?, ?, ?)`;
+
+    // Execute the procedure with provided parameters
+    const result = await this.executeQuery(procedureCall, [category, currentDate, previousDate]);
+    
+    return result;
+  } catch (error) {
+    this.logger.error('Failed to call REPORT_PROCEDURE', error);
+    throw new Error('Failed to call REPORT_PROCEDURE');
+  }
+}
+
+  // Function to truncate the trendData table
+  async flushTrendData(): Promise<void> {
+    const query = 'TRUNCATE TABLE trendData';
+
+    try {
+      await this.executeQuery(query);
+      this.logger.log('Successfully truncated trendData table');
+    } catch (error) {
+      this.logger.error('Failed to truncate trendData table', error);
+      throw new Error('Failed to truncate trendData table');
+    }
+  }
 
 
     async createTest(testDto: TestDto): Promise<any> {
@@ -109,6 +159,7 @@ private async executeQuery(query: string, params: any[] = []): Promise<any[]> {
             });
           });
     }
+
 
 
 
