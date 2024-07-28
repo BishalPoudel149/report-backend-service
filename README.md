@@ -60,13 +60,16 @@ $ npm run test:cov
 
 ## Support
 
+## Chnages Needed
+Google Search Trend API key from SerpAPI (https://serpapi.com/google-trends-api)
+Login /Register then Goto Account Section and get the api key
+
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - Bishal Poudel
+
 
 ## License
 
