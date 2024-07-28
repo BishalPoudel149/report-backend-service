@@ -8,7 +8,9 @@ export class GoogleTrendsService {
 
   timeRange=1;
 
-  private readonly apiKey = 'baaab620ff52b724631301888dadbb707e433771d0db19a46da8e13413836e85'; // Replace with your actual API key
+  //private readonly apiKey = 'baaab620ff52b724631301888dadbb707e433771d0db19a46da8e13413836e85'; // Replace with your actual API key
+
+  private readonly apiKey =process.env.GOOGLE_TREND_API
   private readonly baseUrl = 'https://serpapi.com/search.json';
 
   constructor(private readonly httpService: HttpService) {}

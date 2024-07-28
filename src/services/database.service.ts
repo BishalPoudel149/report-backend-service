@@ -99,10 +99,9 @@ private async executeQuery(query: string, params: any[] = []): Promise<any[]> {
 
 async callReportProcedure(
   category: string,
-  currentDate,
-  previousDate
-  // currentDate: string = new Date().toISOString().split('T')[0], // Default to today
-  // previousDate: string = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0] // Default to one day before today
+ 
+  currentDate: string = new Date().toISOString().split('T')[0], // Default to today
+  previousDate: string = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0] // Default to one day before today
   
 ): Promise<any> {
   try {

@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { ProductService } from './services/product.service';
 import { DatabaseService } from './services/database.service';
 import { GoogleTrendsService } from './services/googledirect.service';
 
 @Injectable()
 export class AppService {
 
-  constructor(private readonly productService: ProductService,
+  constructor(
      private readonly databaseService: DatabaseService,
      private readonly googleTrendsService:GoogleTrendsService
     
@@ -27,14 +26,7 @@ export class AppService {
 
 await this.getTrendsForLocations(category, this.locations);
 
-const currentDate = '2023-11-15';
-const previousDate = '2023-11-13';
-
-// Optional: Ensure dates are in 'YYYY-MM-DD' format
-const formattedCurrentDate = new Date(currentDate).toISOString().split('T')[0];
-const formattedPreviousDate = new Date(previousDate).toISOString().split('T')[0];
-
-   const mappedData = await this.databaseService.callReportProcedure(category,currentDate,previousDate);
+   const mappedData = await this.databaseService.callReportProcedure(category);
    // flush the trend data
 
    this.databaseService.flushTrendData();
