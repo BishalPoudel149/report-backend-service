@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: report-backend
+  - name: dashboard-backend
     memory: 1024M
     instances: 1
     buildpacks:
