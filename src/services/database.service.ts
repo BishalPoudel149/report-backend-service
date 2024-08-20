@@ -14,7 +14,6 @@ export class DatabaseService {
     serverNode: '353f3d0a-ae91-4f8f-a757-99ce5e43fe6b.hana.trial-us10.hanacloud.ondemand.com:443',
     uid: 'DBADMIN',
     pwd: 'innvent24db@Pass',
-    schema: 'DBADMIN',
   };
 
   this.client = hana.createClient(connParams);
@@ -27,6 +26,25 @@ export class DatabaseService {
     }
   });
 }
+
+async findUserByEmail(email: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    this.client.exec(
+      `SELECT * FROM IFC.customer WHERE email = ?`,
+      [email],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else if (result.length === 0) {
+          resolve(null);
+        } else {
+          resolve(result[0]);
+        }
+      },
+    );
+  });
+}
+
 
 async getLocation(category: string): Promise<string[]> {
   try {

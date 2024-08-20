@@ -5,6 +5,8 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseService } from './services/database.service';
 import { GoogleTrendsService } from './services/googledirect.service';
+import { UserController } from './controllers/user.controller';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { GoogleTrendsService } from './services/googledirect.service';
       isGlobal:true,
         })
   ],
-  controllers: [AppController],
-  providers: [AppService,DatabaseService,GoogleTrendsService],
+  controllers: [AppController,UserController],
+  providers: [AppService,DatabaseService,GoogleTrendsService,UserService],
 })
 export class AppModule {}
