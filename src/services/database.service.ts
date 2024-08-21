@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { GoogleTrendDto } from "src/dto/googletrend.dto";
 import { TestDto } from "src/dto/test.dto";
@@ -44,6 +44,17 @@ async findUserByEmail(email: string): Promise<any> {
     );
   });
 }
+
+  async findCustomerProducts(customerId: string): Promise<any[]> {
+    try {
+      const query = 'SELECT CATEGORY,SUBCATEGORY,PRODUCTNAME,BRAND,UNITPRICE FROM IFC.PRODUCT WHERE CUSTOMERID = ?';
+      const result = await this.client.prepare(query).execute([customerId]);
+      return result; // Assuming the result is an array of products
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch customer products');
+    }
+  }
+
 
 
 async getLocation(category: string): Promise<string[]> {
