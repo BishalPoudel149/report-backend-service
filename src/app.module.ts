@@ -7,8 +7,8 @@ import { DatabaseService } from './services/database.service';
 import { GoogleTrendsService } from './services/googledirect.service';
 import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
-import { CategoryService } from './services/category.service';
-import { CategoryController } from './controllers/categorical.controller';
+import { CustomerDataService } from './services/category.service';
+import { CustomerDataController } from './controllers/categorical.controller';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { CategoryController } from './controllers/categorical.controller';
       isGlobal:true,
         })
   ],
-  controllers: [AppController,UserController,CategoryController],
-  providers: [AppService,DatabaseService,GoogleTrendsService,UserService,CategoryService],
+  controllers: [AppController,UserController,CustomerDataController],
+  providers: [AppService,DatabaseService,GoogleTrendsService,UserService,CustomerDataService],
 })
 export class AppModule {}

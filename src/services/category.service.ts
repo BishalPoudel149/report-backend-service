@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { DatabaseService } from "./database.service";
 
 @Injectable()
-export class CategoryService {
+export class CustomerDataService {
 
     constructor(private readonly dbService: DatabaseService) { }
     async customercategory(email: string) {

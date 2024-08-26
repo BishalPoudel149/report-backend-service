@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param } from "@nestjs/common";
-import { CategoryService } from "src/services/category.service";
+import { CustomerDataService } from "src/services/category.service";
 
 @Controller('customer')
-export class CategoryController{
-    constructor(private readonly categoryService:CategoryService){}
+export class CustomerDataController{
+    constructor(private readonly categoryService:CustomerDataService){}
 
     @Get(':customeremail')
     productCategory(@Param() params:any){
