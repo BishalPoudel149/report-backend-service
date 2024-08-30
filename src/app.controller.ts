@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { time } from 'console';
 import { TestDto } from './dto/test.dto';
 import { DatabaseService } from './services/database.service';
+import { EndpointService } from './services/endpoint.service';
 
 @Controller()
 export class AppController {
@@ -11,20 +12,16 @@ export class AppController {
   }
   constructor(private readonly appService: AppService,
     private readonly databaseService: DatabaseService,
+    private readonly endpointService:EndpointService,
   ) {}
 
   days=1;
 
   @Get()
+  @Get()
   getEndpoints(): Record<string, string> {
     // List all available endpoints and their descriptions
-    return {
-      '/': 'Returns a list of all available endpoints',
-      '/user/login' : 'POST  to Login user ',
-
-      '/customer/:customeremail':'Get ,Fetch all the products information for particular Customer'
-      
-    };
+    return this.endpointService.getEndpoints();
   }
 
   @Get('trend/:productCategory')
@@ -38,6 +35,9 @@ export class AppController {
   createTest(@Body() testDto:TestDto){
     return this.databaseService.createTest(testDto);
   }
+
+
+
   
   
 }

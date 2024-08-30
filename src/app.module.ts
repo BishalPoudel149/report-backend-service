@@ -9,6 +9,8 @@ import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { CustomerDataService } from './services/category.service';
 import { CustomerDataController } from './controllers/categorical.controller';
+import { NotFoundExceptionFilter } from './filters/notfound.exception';
+import { EndpointService } from './services/endpoint.service';
 
 @Module({
   imports: [
@@ -18,6 +20,6 @@ import { CustomerDataController } from './controllers/categorical.controller';
         })
   ],
   controllers: [AppController,UserController,CustomerDataController],
-  providers: [AppService,DatabaseService,GoogleTrendsService,UserService,CustomerDataService],
+  providers: [AppService,DatabaseService,GoogleTrendsService,UserService,CustomerDataService,NotFoundExceptionFilter,EndpointService],
 })
 export class AppModule {}

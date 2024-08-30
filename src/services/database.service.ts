@@ -6,6 +6,7 @@ const hana = require('@sap/hana-client');
 
 @Injectable()
 export class DatabaseService {
+ 
   private readonly logger = new Logger(DatabaseService.name);
   private client: any;
 
@@ -45,16 +46,44 @@ async findUserByEmail(email: string): Promise<any> {
   });
 }
 
-  async findCustomerProducts(customerId: string): Promise<any[]> {
+  async findCustomerProducts(customerID: string): Promise<any[]> {
     try {
       const query = 'SELECT CATEGORY,SUBCATEGORY,PRODUCTNAME,BRAND,UNITPRICE FROM IFC.PRODUCT WHERE CUSTOMERID = ?';
-      const result = await this.client.prepare(query).execute([customerId]);
+      const result = await this.client.prepare(query).execute([customerID]);
       return result; // Assuming the result is an array of products
     } catch (error) {
-      throw new InternalServerErrorException('Failed to fetch customer products');
+      throw new InternalServerErrorException('Unable to retrieve customer products. Please try again later.');
     }
   }
 
+
+  async findCustomerStore(email: string,product:string) {
+    try {
+      const query = `SELECT * FROM IFC.GETCUSTOMERSTORES(?,?)`;
+      const statement = await this.client.prepare(query);
+      const result = await statement.execute([email,product]);
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('Unable to retrieve customer store. Please try again later.');
+    }
+  }
+  
+
+  async findCustomerProductStore():Promise<any>{
+   try{
+
+      // Prepare and execute the query to get raw data from the view
+      const query = 'SELECT * FROM IFC.CUSTOMERPRODUCTSSTORESVIEW';
+      const statement = await this.client.prepare(query);
+      const rawData = await statement.execute([]);
+      return rawData;
+
+   }catch(error){
+    throw new InternalServerErrorException('Unable to retrieve customer product store data. Please try again later.');
+   }
+  }
+   
+  
 
 
 async getLocation(category: string): Promise<string[]> {

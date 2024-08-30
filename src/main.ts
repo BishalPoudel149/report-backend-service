@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NotFoundExceptionFilter } from './filters/notfound.exception';
+import { AppController } from './app.controller';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,8 +15,8 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
     allowedHeaders: 'Content-Type, Accept', 
   });
-
-
+  
+  app.useGlobalFilters(app.get(NotFoundExceptionFilter));
 
   await app.listen(port);
 }
